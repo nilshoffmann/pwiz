@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 using System;
+using System.ComponentModel;
+using System.Configuration;
 using System.Deployment.Application;
 using System.IO;
 using System.Linq;
@@ -25,6 +27,7 @@ using log4net;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Repository.Hierarchy;
+using File = System.IO.File;
 
 namespace AutoQC
 {
@@ -32,6 +35,9 @@ namespace AutoQC
     {
         private static readonly ILog LOG = LogManager.GetLogger("AutoQC");
         private static string _version;
+
+        public const bool IsDaily = false;
+        public const string AutoQcShim = Program.IsDaily ? "AutoQCShim-daily" : "AutoQCShim";
 
         [STAThread]
         public static void Main(string[] args)
@@ -44,13 +50,17 @@ namespace AutoQC
             InitializeSecurityProtocol();
 
             var form = new MainForm();
+
+            // CurrentDeployment is null if it isn't network deployed.
             _version = ApplicationDeployment.IsNetworkDeployed
                 ? ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString()
-                : "DEV";
+                : "";
             form.Text = Version();
 
-            //Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
-            //Console.WriteLine("Local user config path: {0}", config.FilePath);
+
+            // TODO: Remove this
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
+            Console.WriteLine("Local user config path: {0}", config.FilePath);
 
             // Handle exceptions on the UI thread.
             Application.ThreadException += ((sender, e) => LOG.Error(e.Exception));
@@ -70,10 +80,67 @@ namespace AutoQC
                 {
                     Application.Exit();
                 }
-            }
-                );
+            });
 
-            Application.Run(form);       
+            var worker = new BackgroundWorker { WorkerSupportsCancellation = false, WorkerReportsProgress = false };
+            worker.DoWork += UpdateAutoQcShim;
+            worker.RunWorkerCompleted += (o, eventArgs) =>
+            {
+                if (eventArgs.Error != null)
+                {
+                    form.DisplayError($"{AutoQcShim} Update Error", eventArgs.Error.ToString());
+                }
+            };
+
+            worker.RunWorkerAsync();
+
+            Application.Run(form);
+        }
+
+        private static void UpdateAutoQcShim(object sender, DoWorkEventArgs e)
+        {
+            if (ApplicationDeployment.IsNetworkDeployed && IsFirstRun())
+            {
+                LogInfo($"Application is network deployed {ApplicationDeployment.CurrentDeployment.CurrentVersion}");
+                LogInfo($"Is First Run Property: {ApplicationDeployment.CurrentDeployment.IsFirstRun}"); // TODO: Remove this
+                if (Properties.Settings.Default.KeepAutoQcRunning)
+                {
+                    LogInfo($"Updating {AutoQcShim} shortcut.");
+                    StartupManager.UpdateAutoQcShimInStartup();
+                }
+            }
+        }
+
+        private static bool IsFirstRun()
+        {
+            // https://stackoverflow.com/questions/5811780/how-do-i-detect-the-first-time-a-clickonce-deployed-application-has-been-run  
+            if (!ApplicationDeployment.IsNetworkDeployed)
+                return false;
+
+            var location = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            var installDir = Path.GetDirectoryName(location);
+            if (installDir == null)
+            {
+                LogError($"Cannot get install directory from location {location}");
+                return false;
+            }
+
+            var newInstallFile = Path.Combine(installDir, "NewInstall.txt");
+            if (!File.Exists(newInstallFile))
+            {
+                return false;
+            }
+            try
+            {
+                // Delete the file so that the next time the program startup this method will return false.
+                File.Delete(newInstallFile);
+            }
+            catch (Exception)
+            {
+                LogError($"Error deleting NewInstall.txt at path: {newInstallFile}");
+            }
+
+            return true;
         }
 
         public static void LogError(string message)
@@ -116,7 +183,7 @@ namespace AutoQC
 
         public static string Version()
         {
-            return MainForm.IS_DAILY ? string.Format("AutoQC Loader-daily {0}", _version) : string.Format("AutoQC Loader {0}", _version);
+            return IsDaily ? string.Format("AutoQC Loader-daily {0}", _version) : string.Format("AutoQC Loader {0}", _version);
         }
 
         public static void InitializeSecurityProtocol()
