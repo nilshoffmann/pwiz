@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AutoQCShim")]
+[assembly: AssemblyTitle("AutoQCStarter")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("University of Washington")]
-[assembly: AssemblyProduct("AutoQCShim")]
+[assembly: AssemblyProduct("AutoQCStarter")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("4326b7c2-2362-4fea-abae-8fe34ce5a685")]
+[assembly: Guid("296123d9-c4d5-4bd7-818e-02283762a636")]
 
 // Version information for an assembly consists of the following four values:
 //
