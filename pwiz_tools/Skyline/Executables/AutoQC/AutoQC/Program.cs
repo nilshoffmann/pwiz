@@ -17,11 +17,12 @@
  */
 using System;
 using System.ComponentModel;
-using System.Configuration;
 using System.Deployment.Application;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Windows.Forms;
 using log4net;
 using log4net.Appender;
@@ -36,35 +37,17 @@ namespace AutoQC
         private static readonly ILog LOG = LogManager.GetLogger("AutoQC");
         private static string _version;
 
-        public const bool IsDaily = false;
-        public const string AutoQcShim = Program.IsDaily ? "AutoQCShim-daily" : "AutoQCShim";
+        public const bool IsDaily = true;
+        public const string AutoQcStarter = "AutoQCStarter";
 
         [STAThread]
         public static void Main(string[] args)
         {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
-
-            // Initialize log4net -- global application logging
-            XmlConfigurator.Configure();
-
-            InitializeSecurityProtocol();
-
-            var form = new MainForm();
-
-            // CurrentDeployment is null if it isn't network deployed.
-            _version = ApplicationDeployment.IsNetworkDeployed
-                ? ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString()
-                : "";
-            form.Text = Version();
-
-
-            // TODO: Remove this
-            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
-            Console.WriteLine("Local user config path: {0}", config.FilePath);
-
             // Handle exceptions on the UI thread.
             Application.ThreadException += ((sender, e) => LOG.Error(e.Exception));
-
             // Handle exceptions on the non-UI thread.
             AppDomain.CurrentDomain.UnhandledException += ((sender, e) =>
             {
@@ -73,8 +56,8 @@ namespace AutoQC
                     LOG.Error("AutoQC Loader encountered an unexpected error. ", (Exception)e.ExceptionObject);
                     MessageBox.Show("AutoQC Loader encountered an unexpected error. " +
                                     "Error details may be found in the AutoQCProgram.log file in this directory : "
-                                     + Path.GetDirectoryName(Application.ExecutablePath)
-                                    );
+                                    + Path.GetDirectoryName(Application.ExecutablePath)
+                    );
                 }
                 finally
                 {
@@ -82,31 +65,58 @@ namespace AutoQC
                 }
             });
 
-            var worker = new BackgroundWorker { WorkerSupportsCancellation = false, WorkerReportsProgress = false };
-            worker.DoWork += UpdateAutoQcShim;
-            worker.RunWorkerCompleted += (o, eventArgs) =>
+            using (var mutex = new Mutex(false, $"University of Washington {AppName()}"))
             {
-                if (eventArgs.Error != null)
+                if (!mutex.WaitOne(TimeSpan.Zero))
                 {
-                    form.DisplayError($"{AutoQcShim} Update Error", eventArgs.Error.ToString());
+                    MessageBox.Show($"{AppName()} is already running.", $"{AppName()} Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
-            };
 
-            worker.RunWorkerAsync();
+                InitializeSecurityProtocol();
 
-            Application.Run(form);
+                // Initialize log4net -- global application logging
+                XmlConfigurator.Configure();
+
+                var form = new MainForm();
+
+                // CurrentDeployment is null if it isn't network deployed.
+                _version = ApplicationDeployment.IsNetworkDeployed
+                    ? ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString()
+                    : "";
+                form.Text = Version();
+
+                //var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
+                //Console.WriteLine("Local user config path: {0}", config.FilePath);
+
+                var worker = new BackgroundWorker {WorkerSupportsCancellation = false, WorkerReportsProgress = false};
+                worker.DoWork += UpdateAutoQcStarter;
+                worker.RunWorkerCompleted += (o, eventArgs) =>
+                {
+                    if (eventArgs.Error != null)
+                    {
+                        form.DisplayError($"{AutoQcStarter} Update Error", eventArgs.Error.ToString());
+                    }
+                };
+
+                worker.RunWorkerAsync();
+
+                Application.Run(form);
+
+                mutex.ReleaseMutex();
+            }
         }
 
-        private static void UpdateAutoQcShim(object sender, DoWorkEventArgs e)
+        private static void UpdateAutoQcStarter(object sender, DoWorkEventArgs e)
         {
             if (ApplicationDeployment.IsNetworkDeployed && IsFirstRun())
             {
-                LogInfo($"Application is network deployed {ApplicationDeployment.CurrentDeployment.CurrentVersion}");
+                LogInfo($"Network deployed application version: {ApplicationDeployment.CurrentDeployment.CurrentVersion}");
                 LogInfo($"Is First Run Property: {ApplicationDeployment.CurrentDeployment.IsFirstRun}"); // TODO: Remove this
                 if (Properties.Settings.Default.KeepAutoQcRunning)
                 {
-                    LogInfo($"Updating {AutoQcShim} shortcut.");
-                    StartupManager.UpdateAutoQcShimInStartup();
+                    LogInfo($"Updating {AutoQcStarter} shortcut.");
+                    StartupManager.UpdateAutoQcStarterInStartup();
                 }
             }
         }
@@ -117,7 +127,19 @@ namespace AutoQC
             if (!ApplicationDeployment.IsNetworkDeployed)
                 return false;
 
-            var location = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            var currentVersion = ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString();
+            var installedVersion = Properties.Settings.Default.InstalledVersion ?? "";
+            if (!currentVersion.Equals(installedVersion))
+            {
+                LogInfo($"Current version: {currentVersion} is newer than the last installed version: {installedVersion}.");
+                Properties.Settings.Default.InstalledVersion = currentVersion;
+                Properties.Settings.Default.Save();
+                return true;
+            }
+            LogInfo($"Current version: {currentVersion} same as last installed version: {installedVersion}.");
+            return false;
+
+            /*var location = System.Reflection.Assembly.GetExecutingAssembly().Location;
             var installDir = Path.GetDirectoryName(location);
             if (installDir == null)
             {
@@ -132,7 +154,7 @@ namespace AutoQC
             }
             try
             {
-                // Delete the file so that the next time the program startup this method will return false.
+                // Delete the file so that the next time the program starts up this method will return false.
                 File.Delete(newInstallFile);
             }
             catch (Exception)
@@ -140,7 +162,7 @@ namespace AutoQC
                 LogError($"Error deleting NewInstall.txt at path: {newInstallFile}");
             }
 
-            return true;
+            return true;*/
         }
 
         public static void LogError(string message)
@@ -183,7 +205,12 @@ namespace AutoQC
 
         public static string Version()
         {
-            return IsDaily ? string.Format("AutoQC Loader-daily {0}", _version) : string.Format("AutoQC Loader {0}", _version);
+            return $"{AppName()} {_version}";
+        }
+
+        public static string AppName()
+        {
+            return IsDaily ? "AutoQC Loader-daily" : "AutoQC Loader";
         }
 
         public static void InitializeSecurityProtocol()

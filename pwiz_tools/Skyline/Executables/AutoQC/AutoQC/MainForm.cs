@@ -736,8 +736,11 @@ namespace AutoQC
 
         private void UpdateSettingsTab()
         {
-            cb_minimizeToSysTray.Checked = Properties.Settings.Default.MinimizeToSystemTray;
-            cb_keepRunning.Checked = Properties.Settings.Default.KeepAutoQcRunning;
+            cb_minimizeToSysTray.Checked = Settings.Default.MinimizeToSystemTray;
+            cb_keepRunning.Checked = Settings.Default.KeepAutoQcRunning;
+
+            cb_minimizeToSysTray.CheckedChanged += cb_minimizeToSysTray_CheckedChanged;
+            cb_keepRunning.CheckedChanged += cb_keepRunning_CheckedChanged;
         }
 
         public void UpdateConfiguration(AutoQcConfig oldConfig, AutoQcConfig newConfig)
@@ -920,9 +923,9 @@ namespace AutoQC
             }
         }
 
-        private void SaveSettingsButton_MouseClick(object sender, MouseEventArgs e)
+        private void cb_keepRunning_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.Default.MinimizeToSystemTray = cb_minimizeToSysTray.Checked;
+            cb_keepRunning.Enabled = false;
             Settings.Default.KeepAutoQcRunning = cb_keepRunning.Checked;
             Settings.Default.Save();
 
@@ -934,6 +937,13 @@ namespace AutoQC
             {
                 StartupManager.DisableKeepRunning();
             }
+            cb_keepRunning.Enabled = true;
+        }
+
+        private void cb_minimizeToSysTray_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.Default.MinimizeToSystemTray = cb_minimizeToSysTray.Checked;
+            Settings.Default.Save();
         }
     }
 

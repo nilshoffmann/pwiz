@@ -76,10 +76,7 @@
   <PropertyGroup />
   <PropertyGroup />
   <ItemGroup>
-    <Content Include="AutoQCShim-daily.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AutoQCShim.exe">
+    <Content Include="AutoQCStarter.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SkylineDailyRunner.exe">

@@ -53,7 +53,6 @@
             this.textBoxLog = new System.Windows.Forms.RichTextBox();
             this.comboConfigs = new System.Windows.Forms.ComboBox();
             this.tabSettings = new System.Windows.Forms.TabPage();
-            this.saveSettingsButton = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.cb_minimizeToSysTray = new System.Windows.Forms.CheckBox();
             this.cb_keepRunning = new System.Windows.Forms.CheckBox();
@@ -313,7 +312,6 @@
             // tabSettings
             // 
             this.tabSettings.BackColor = System.Drawing.SystemColors.Control;
-            this.tabSettings.Controls.Add(this.saveSettingsButton);
             this.tabSettings.Controls.Add(this.groupBox1);
             this.tabSettings.Location = new System.Drawing.Point(4, 29);
             this.tabSettings.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -322,17 +320,6 @@
             this.tabSettings.Size = new System.Drawing.Size(1100, 815);
             this.tabSettings.TabIndex = 2;
             this.tabSettings.Text = "Settings";
-            // 
-            // saveSettingsButton
-            // 
-            this.saveSettingsButton.Location = new System.Drawing.Point(80, 215);
-            this.saveSettingsButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.saveSettingsButton.Name = "saveSettingsButton";
-            this.saveSettingsButton.Size = new System.Drawing.Size(170, 35);
-            this.saveSettingsButton.TabIndex = 5;
-            this.saveSettingsButton.Text = "Save Settings";
-            this.saveSettingsButton.UseVisualStyleBackColor = true;
-            this.saveSettingsButton.MouseClick += new System.Windows.Forms.MouseEventHandler(this.SaveSettingsButton_MouseClick);
             // 
             // groupBox1
             // 
@@ -430,6 +417,5 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.CheckBox cb_keepRunning;
         private System.Windows.Forms.NotifyIcon systray_icon;
-        private System.Windows.Forms.Button saveSettingsButton;
     }
 }

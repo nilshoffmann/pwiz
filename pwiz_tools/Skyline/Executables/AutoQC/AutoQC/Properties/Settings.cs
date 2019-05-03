@@ -54,6 +54,20 @@ namespace AutoQC.Properties
                 this["KeepAutoQcRunning"] = value;
             }
         }
+
+        [UserScopedSetting]
+        [DefaultSettingValue("")]
+        public string InstalledVersion
+        {
+            get
+            {
+                return (string)this["InstalledVersion"];
+            }
+            set
+            {
+                this["InstalledVersion"] = value;
+            }
+        }
     }
 
     public class ConfigList : Collection<AutoQcConfig>, IXmlSerializable
