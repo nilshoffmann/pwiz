@@ -2035,7 +2035,12 @@ namespace pwiz.Skyline.Model.Results
         public SignedMz PrecursorMz { get { return new SignedMz(_groupHeaderInfo.Precursor, _groupHeaderInfo.NegativeCharge); } }
         public string TextId
         {
-            get { return Encoding.UTF8.GetString(_textIdBytes, _groupHeaderInfo.TextIdIndex, _groupHeaderInfo.TextIdLen); }
+            get
+            {
+                return _groupHeaderInfo.TextIdIndex != -1
+                    ? Encoding.UTF8.GetString(_textIdBytes, _groupHeaderInfo.TextIdIndex, _groupHeaderInfo.TextIdLen)
+                    : null;
+            }
         }
         public double? PrecursorCollisionalCrossSection { get { return _groupHeaderInfo.CollisionalCrossSection; } }
         public MsDataFileUri FilePath { get { return _allFiles[_groupHeaderInfo.FileIndex].FilePath; } }
