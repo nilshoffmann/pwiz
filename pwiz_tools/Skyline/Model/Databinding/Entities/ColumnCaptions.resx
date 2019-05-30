@@ -1166,4 +1166,10 @@
   <data name="UTCTime">
     <value>UTC Time</value>
   </data>
+  <data name="SampleId" xml:space="preserve">
+    <value>Sample Id</value>
+  </data>
+  <data name="SerialNumber" xml:space="preserve">
+    <value>Serial Number</value>
+  </data>
 </root>

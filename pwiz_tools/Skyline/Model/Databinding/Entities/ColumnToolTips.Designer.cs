@@ -2884,6 +2884,15 @@ namespace pwiz.Skyline.Model.Databinding.Entities {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A free text identifier for referring to a sample (which may be shared among multiple files). Read from the &quot;sample id&quot; attribute in an imported result file.
+        /// </summary>
+        public static string SampleId {
+            get {
+                return ResourceManager.GetString("SampleId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The sample name, if the data was imported from a multi-sample WIFF
         ///file, or the file name again for other file types..
         /// </summary>
@@ -2905,6 +2914,15 @@ namespace pwiz.Skyline.Model.Databinding.Entities {
         public static string SampleType {
             get {
                 return ResourceManager.GetString("SampleType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The instrument serial number read from an imported result file.
+        /// </summary>
+        public static string SerialNumber {
+            get {
+                return ResourceManager.GetString("SerialNumber", resourceCulture);
             }
         }
         
