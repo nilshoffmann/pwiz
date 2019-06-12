@@ -697,7 +697,7 @@ namespace pwiz.Skyline.Model.Results
             ion_mobility_type,
             sample_dilution_factor,
             sample_id,
-            serial_number,
+            instrument_serial_number,
         }
 
         private static readonly IXmlElementHelper<OptimizableRegression>[] OPTIMIZATION_HELPERS =
@@ -743,7 +743,7 @@ namespace pwiz.Skyline.Model.Results
                     reader.GetNullableDoubleAttribute(ATTR.explicit_global_standard_area));
                 chromFileInfo = chromFileInfo.ChangeTicArea(reader.GetNullableDoubleAttribute(ATTR.tic_area));
                 chromFileInfo = chromFileInfo.ChangeSampleId(reader.GetAttribute(ATTR.sample_id));
-                chromFileInfo = chromFileInfo.ChangeSerialNumber(reader.GetAttribute(ATTR.serial_number));
+                chromFileInfo = chromFileInfo.ChangeSerialNumber(reader.GetAttribute(ATTR.instrument_serial_number));
                 chromFileInfos.Add(chromFileInfo);
                 
                 string id = reader.GetAttribute(ATTR.id) ?? GetOrdinalSaveId(fileLoadIds.Count);
@@ -797,9 +797,9 @@ namespace pwiz.Skyline.Model.Results
                 {
                     writer.WriteAttribute(ATTR.sample_id, fileInfo.SampleId);
                 }
-                if (!string.IsNullOrEmpty(fileInfo.SerialNumber))
+                if (!string.IsNullOrEmpty(fileInfo.InstrumentSerialNumber))
                 {
-                    writer.WriteAttribute(ATTR.serial_number, fileInfo.SerialNumber);
+                    writer.WriteAttribute(ATTR.instrument_serial_number, fileInfo.InstrumentSerialNumber);
                 }
                 if (fileInfo.RunStartTime != null)
                 {
@@ -964,7 +964,7 @@ namespace pwiz.Skyline.Model.Results
         public double? TicArea { get; private set; }
         public eIonMobilityUnits IonMobilityUnits { get; private set; }
         public string SampleId { get; private set; }
-        public string SerialNumber { get; private set; }
+        public string InstrumentSerialNumber { get; private set; }
 
         public IList<MsInstrumentConfigInfo> InstrumentInfoList
         {
@@ -1010,7 +1010,7 @@ namespace pwiz.Skyline.Model.Results
                                                      im.TicArea = fileInfo.TicArea;
                                                      im.IonMobilityUnits = fileInfo.IonMobilityUnits;
                                                      im.SampleId = fileInfo.SampleId;
-                                                     im.SerialNumber = fileInfo.SerialNumber;
+                                                     im.InstrumentSerialNumber = fileInfo.InstrumentSerialNumber;
                                                  });
         }
 
@@ -1026,7 +1026,7 @@ namespace pwiz.Skyline.Model.Results
 
         public ChromFileInfo ChangeSerialNumber(string serialNumber)
         {
-            return ChangeProp(ImClone(this), im => im.SerialNumber = serialNumber);
+            return ChangeProp(ImClone(this), im => im.InstrumentSerialNumber = serialNumber);
         }
 
         public ChromFileInfo ChangeRetentionTimeAlignments(IEnumerable<KeyValuePair<ChromFileInfoId, RegressionLineElement>> retentionTimeAlignments)
@@ -1073,7 +1073,7 @@ namespace pwiz.Skyline.Model.Results
                 return false;
             if (!Equals(SampleId, other.SampleId))
                 return false;
-            if (!Equals(SerialNumber, other.SerialNumber))
+            if (!Equals(InstrumentSerialNumber, other.InstrumentSerialNumber))
                 return false;
             if (!ArrayUtil.EqualsDeep(other.InstrumentInfoList, InstrumentInfoList))
                 return false;
@@ -1110,7 +1110,7 @@ namespace pwiz.Skyline.Model.Results
                 result = (result * 397) ^ TicArea.GetHashCode();
                 result = (result * 397) ^ IonMobilityUnits.GetHashCode();
                 result = (result * 397) ^ SampleId?.GetHashCode() ?? 0;
-                result = (result * 397) ^ SerialNumber?.GetHashCode() ?? 0;
+                result = (result * 397) ^ InstrumentSerialNumber?.GetHashCode() ?? 0;
                 return result;
             }
         }

@@ -1411,7 +1411,7 @@ namespace pwiz.Skyline.Model.Results
                                float? ticArea,
                                eIonMobilityUnits ionMobilityUnits,
                                string sampleId,
-                               string serialNumber,
+                               string instrumentSerialNumber,
                                IEnumerable<MsInstrumentConfigInfo> instrumentInfoList)
         {
             FilePath = filePath;
@@ -1424,7 +1424,7 @@ namespace pwiz.Skyline.Model.Results
             LocationScanIds = locationScanIds;
             TicArea = ticArea;
             SampleId = sampleId;
-            SerialNumber = serialNumber;
+            InstrumentSerialNumber = instrumentSerialNumber;
             InstrumentInfoList = ImmutableList.ValueOf(instrumentInfoList) ?? ImmutableList<MsInstrumentConfigInfo>.EMPTY;
         }
 
@@ -1440,7 +1440,7 @@ namespace pwiz.Skyline.Model.Results
         public float? TicArea { get; private set; }
         public eIonMobilityUnits IonMobilityUnits { get { return IonMobilityUnitsFromFlags(Flags); } }
         public string SampleId { get; private set; }
-        public string SerialNumber { get; private set; }
+        public string InstrumentSerialNumber { get; private set; }
 
         public bool IsCurrent
         {
@@ -1479,7 +1479,7 @@ namespace pwiz.Skyline.Model.Results
 
         public ChromCachedFile ChangeSerialNumber(string serialNumber)
         {
-            return ChangeProp(ImClone(this), im => im.SerialNumber = serialNumber);
+            return ChangeProp(ImClone(this), im => im.InstrumentSerialNumber = serialNumber);
         }
     }
 

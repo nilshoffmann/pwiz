@@ -167,9 +167,9 @@ namespace pwiz.Skyline.Model.Databinding.Entities
             get { return ChromFileInfo.SampleId; }
         }
 
-        public string SerialNumber
+        public string InstrumentSerialNumber
         {
-            get { return ChromFileInfo.SerialNumber; }
+            get { return ChromFileInfo.InstrumentSerialNumber; }
         }
 
         public override ElementRef GetElementRef()

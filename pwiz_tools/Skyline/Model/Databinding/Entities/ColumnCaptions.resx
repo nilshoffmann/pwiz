@@ -1169,7 +1169,7 @@
   <data name="SampleId" xml:space="preserve">
     <value>Sample Id</value>
   </data>
-  <data name="SerialNumber" xml:space="preserve">
-    <value>Serial Number</value>
+  <data name="InstrumentSerialNumber" xml:space="preserve">
+    <value>Instrument Serial Number</value>
   </data>
 </root>

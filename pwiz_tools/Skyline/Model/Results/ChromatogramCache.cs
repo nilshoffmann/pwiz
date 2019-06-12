@@ -988,7 +988,7 @@ namespace pwiz.Skyline.Model.Results
                 var instrumentInfoBytes =
                     Encoding.UTF8.GetBytes(InstrumentInfoUtil.GetInstrumentInfoString(cachedFile.InstrumentInfoList));
                 var sampleIdBytes = Encoding.UTF8.GetBytes(cachedFile.SampleId ?? string.Empty);
-                var serialNumberBytes = Encoding.UTF8.GetBytes(cachedFile.SerialNumber ?? string.Empty);
+                var serialNumberBytes = Encoding.UTF8.GetBytes(cachedFile.InstrumentSerialNumber ?? string.Empty);
                 var cachedFileStruct = new CachedFileHeaderStruct
                 {
                     modified = cachedFile.FileWriteTime.ToBinary(),

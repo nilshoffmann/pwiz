@@ -370,7 +370,7 @@ namespace pwiz.Skyline.Model.Results
                                      cachedFile.IsSingleMatchMz,
                                      cachedFile.HasMidasSpectra,
                                      cachedFile.SampleId,
-                                     cachedFile.SerialNumber);
+                                     cachedFile.InstrumentSerialNumber);
         }
 
         private MsDataFileImpl GetMsDataFile(string dataFilePathPart, int sampleIndex, LockMassParameters lockMassParameters, MsInstrumentConfigInfo msInstrumentConfigInfo, bool enableSimSpectrum, bool requireCentroidedMS1, bool requireCentroidedMS2, int preferOnlyMsLevel)

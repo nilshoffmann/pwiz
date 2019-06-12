@@ -1040,6 +1040,15 @@ namespace pwiz.Skyline.Model.Databinding.Entities {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The instrument serial number read from an imported result file.
+        /// </summary>
+        public static string InstrumentSerialNumber {
+            get {
+                return ResourceManager.GetString("InstrumentSerialNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Comma separated list of chromatogram intensities..
         /// </summary>
         public static string Intensities {
@@ -2914,15 +2923,6 @@ namespace pwiz.Skyline.Model.Databinding.Entities {
         public static string SampleType {
             get {
                 return ResourceManager.GetString("SampleType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The instrument serial number read from an imported result file.
-        /// </summary>
-        public static string SerialNumber {
-            get {
-                return ResourceManager.GetString("SerialNumber", resourceCulture);
             }
         }
         
