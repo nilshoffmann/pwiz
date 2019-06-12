@@ -211,8 +211,7 @@ namespace pwiz.Skyline.Model.Results
                         if (null == inFile)
                         {
                             _currentFileInfo = new FileBuildInfo(fileInfo.RunStartTime,
-                                fileInfo.FileWriteTime ?? DateTime.Now, new MsInstrumentConfigInfo[0], null, false,
-                                inFile.GetSampleId(), inFile.GetInstrumentSerialNumber());
+                                fileInfo.FileWriteTime ?? DateTime.Now, new MsInstrumentConfigInfo[0], null, false, null, null);
                         }
                         else
                         {
